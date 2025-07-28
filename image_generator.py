@@ -1,8 +1,18 @@
+# ==========================================================
+# DCGAN for Saffron Flower Image Generation
+# Works even if all images are in a single folder
+# ==========================================================
+# Author: ChatGPT
+# Requirements: pytorch, torchvision, matplotlib, pillow
+# ==========================================================
+
 import os
+import glob
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torchvision.datasets as dset
+from torch.utils.data import Dataset, DataLoader
+from PIL import Image
 import torchvision.transforms as transforms
 import torchvision.utils as vutils
 import matplotlib.pyplot as plt
@@ -11,7 +21,7 @@ import numpy as np
 # =========================================
 # CONFIGURATION
 # =========================================
-dataroot = "./saffron_dataset"   # Path to your saffron dataset folder
+dataroot = "./SIP_data_images"   # Path to your saffron dataset folder
 image_size = 64                  # Image size (64x64)
 batch_size = 128
 nc = 3                           # Number of color channels (3 for RGB)
@@ -24,19 +34,33 @@ beta1 = 0.5                      # Adam optimizer beta1
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # =========================================
-# DATA LOADING
+# CUSTOM DATASET LOADER
 # =========================================
-dataset = dset.ImageFolder(root=dataroot,
-                           transform=transforms.Compose([
-                               transforms.Resize(image_size),
-                               transforms.CenterCrop(image_size),
-                               transforms.ToTensor(),
-                               transforms.Normalize((0.5, 0.5, 0.5),
-                                                    (0.5, 0.5, 0.5)),
-                           ]))
+class CustomImageDataset(Dataset):
+    def __init__(self, root_dir, transform=None):
+        self.files = glob.glob(os.path.join(root_dir, "*"))
+        self.transform = transform
 
-dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
-                                         shuffle=True, num_workers=2)
+    def __len__(self):
+        return len(self.files)
+
+    def __getitem__(self, idx):
+        img_path = self.files[idx]
+        img = Image.open(img_path).convert("RGB")
+        if self.transform:
+            img = self.transform(img)
+        return img, 0  # label not used
+
+transform = transforms.Compose([
+    transforms.Resize(image_size),
+    transforms.CenterCrop(image_size),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,0.5,0.5),(0.5,0.5,0.5)),
+])
+
+dataset = CustomImageDataset(dataroot, transform=transform)
+dataloader = DataLoader(dataset, batch_size=batch_size,
+                        shuffle=True, num_workers=0)
 
 # =========================================
 # WEIGHTS INITIALIZATION
@@ -127,7 +151,6 @@ optimizerG = optim.Adam(netG.parameters(), lr=lr, betas=(beta1, 0.999))
 # TRAINING LOOP
 # =========================================
 print("Starting Training Loop...")
-img_list = []
 for epoch in range(num_epochs):
     for i, data in enumerate(dataloader, 0):
         # Update Discriminator
@@ -167,7 +190,6 @@ for epoch in range(num_epochs):
     with torch.no_grad():
         fake = netG(fixed_noise).detach().cpu()
     img_grid = vutils.make_grid(fake, padding=2, normalize=True)
-    img_list.append(img_grid)
     vutils.save_image(img_grid, f"epoch_{epoch}_preview.png")
 
 # =========================================
@@ -179,10 +201,10 @@ print("Training complete. Model saved as saffron_generator.pth")
 # =========================================
 # GENERATE NEW IMAGES AFTER TRAINING
 # =========================================
-output_dir = "final_generated_saffron_images"
+output_dir = "result_image"
 os.makedirs(output_dir, exist_ok=True)
 
-num_images = 200   # <-- change to how many you want
+num_images = 200   # <-- change number as needed
 batch_size = 64
 count = 0
 
