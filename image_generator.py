@@ -26,12 +26,44 @@ output_folder = "./result_image"
 os.makedirs(output_folder, exist_ok=True)
 
 # Prompt Engineering
+# prompt = (
+#     "A high-resolution close-up photograph of a fully bloomed saffron flower, "
+#     "captured from different angles, showing the red stigma and style clearly for plucking, "
+#     "macro photography, sharp focus, vibrant natural colors, realistic"
+# )
+# negative_prompt = "blurry, cropped, distorted, missing petals, low quality, watermark, text, cartoon, painting"
+
+# prompt = (
+#     "Ultra-realistic high-resolution close-up photograph of a saffron flower "
+#     "in a green agricultural field, showing the full bloom with clear red stigmas "
+#     "and yellow styles visible for plucking, captured from multiple angles. "
+#     "Natural lighting, macro botanical photography style, extremely detailed petals, "
+#     "sharp focus, vibrant natural colors, photorealistic, DSLR quality"
+# )
+
+# negative_prompt = (
+#     "blurry, low quality, cartoon, painting, distorted, cropped, out of frame, "
+#     "missing petals, artificial, unrealistic, duplicate flowers, watermark, text"
+# )
+
 prompt = (
-    "A high-resolution close-up photograph of a fully bloomed saffron flower, "
-    "captured from different angles, showing the red stigma and style clearly for plucking, "
-    "macro photography, sharp focus, vibrant natural colors, realistic"
+    "Ultra-realistic high-resolution close-up photograph of a saffron flower "
+    "growing naturally in a saffron field with rows of green saffron plants. "
+    "The soil is light brown, slightly dry, and finely textured, with natural furrows "
+    "typical of saffron cultivation. The flower is fully bloomed with vibrant purple petals, "
+    "clear red stigmas, and yellow styles visible for plucking. Captured from multiple angles, "
+    "showing both the flower and the surrounding field environment. "
+    "Soft natural sunlight, macro botanical photography, sharp focus, "
+    "extremely detailed petals and realistic soil texture, DSLR quality, photorealistic"
 )
-negative_prompt = "blurry, cropped, distorted, missing petals, low quality, watermark, text, cartoon, painting"
+
+negative_prompt = (
+    "blurry, low quality, cartoon, painting, distorted, cropped, out of frame, "
+    "missing petals, artificial, unrealistic, duplicate flowers, fake soil, "
+    "dark background, plastic look, watermark, text"
+)
+
+
 
 # Parameters
 strength = 0.45           # how much to modify input image
